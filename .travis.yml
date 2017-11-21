@@ -4,9 +4,7 @@ php: '7.0'
 
 script:
   - composer install
-  - phpunit --coverage-clover=coverage.clover
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+  - phpunit
 
 notifications:
   email:
