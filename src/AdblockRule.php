@@ -106,7 +106,7 @@ class AdblockRule
         // Separator character ^ matches anything but a letter, a digit, or
         // one of the following: _ - . %. The end of the address is also
         // accepted as separator.
-        $regex = str_replace("^", "([^\w\d_\-.%]|$)", $regex);
+        $regex = str_replace("^", "([^\w\d_\-\.%]|$)", $regex);
 
         // * symbol
         $regex = str_replace("*", ".*", $regex);

@@ -2,7 +2,6 @@
 namespace Limonte\Tests;
 
 use Limonte\AdblockRule;
-use Limonte\InvalidRuleException;
 
 class AdblockRuleTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +12,7 @@ class AdblockRuleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Limonte\InvalidRuleException
+     * @expectedException \Limonte\InvalidRuleException
      */
     public function testInvalidRegex()
     {
@@ -30,7 +29,7 @@ class AdblockRuleTest extends \PHPUnit_Framework_TestCase
     public function testCaret()
     {
         $rule = new AdblockRule('domain^');
-        $this->assertEquals('domain([^\w\d_\-.%]|$)', $rule->getRegex());
+        $this->assertEquals('domain([^\w\d_\-\.%]|$)', $rule->getRegex());
     }
 
     public function testAsterisk()
