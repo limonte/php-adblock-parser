@@ -28,8 +28,8 @@ class AdblockParser
             }
         }
 
-        // Sort rules, eceptions first
-        usort($this->rules, function ($a, $b) {
+        // Sort rules, exceptions first
+        usort($this->rules, function (AdblockRule $a, AdblockRule $b) {
             return (int)$a->isException() < (int)$b->isException();
         });
     }
@@ -69,7 +69,7 @@ class AdblockParser
     /**
      * @param  string  $url
      *
-     * @return integer
+     * @return boolean
      */
     public function shouldBlock($url)
     {
