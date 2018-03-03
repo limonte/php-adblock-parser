@@ -1,6 +1,6 @@
 {
   "name": "limonte/php-adblock-parser",
-  "description": "Check if link is spam via Google Safebrowsing",
+  "description": "PHP parser for Adblock Plus filters",
   "keywords": [
     "adblock",
     "parser"
