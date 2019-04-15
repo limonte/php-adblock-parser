@@ -1,5 +1,5 @@
 {
-  "name": "limonte/php-adblock-parser",
+  "name": "WinnerSoftLab/php-adblock-parser",
   "description": "PHP parser for Adblock Plus filters",
   "keywords": [
     "adblock",
@@ -18,6 +18,9 @@
   },
   "require-dev": {
     "phpunit/phpunit": "~5.5"
+  },
+  "replace": {
+      "limonte/php-adblock-parser": "v0.1.6"
   },
   "autoload": {
     "psr-4": {
