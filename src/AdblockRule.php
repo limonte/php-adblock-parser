@@ -1,19 +1,47 @@
 <?php
+
 namespace Limonte;
 
 class AdblockRule
 {
+    const FILTER_REGEXES = [
+        '/\$[script|image|stylesheet|object|object\-subrequest|subdocument|xmlhttprequest|websocket|webrtc|popup|generichide|genericblock|document|elemhide|third\-party|domain|rewrite]+.*domain=~?(.*)/i' => '$1',
+        '/\$[script|image|stylesheet|object|object\-subrequest|subdocument|xmlhttprequest|websocket|webrtc|popup|generichide|genericblock|document|elemhide|third\-party|domain|rewrite]+.*$/i' => '',
+        '/([\\\.\$\+\?\{\}\(\)\[\]\/])/' => '\\\\$1'
+    ];
+
+    /**
+     * @var string
+     */
     private $rule;
 
+    /**
+     * @var string
+     */
     private $regex;
 
+    /**
+     * @var bool
+     */
     private $isComment = false;
 
+    /**
+     * @var bool
+     */
     private $isHtml = false;
 
+    /**
+     * @var bool
+     */
     private $isException = false;
 
-    public function __construct($rule)
+
+    /**
+     * AdblockRule constructor.
+     * @param string $rule
+     * @throws InvalidRuleException
+     */
+    public function __construct(string $rule)
     {
         $this->rule = $rule;
 
@@ -26,27 +54,28 @@ class AdblockRule
         if (Str::startsWith($rule, '!') || Str::startsWith($rule, '[Adblock')) {
             $this->isComment = true;
 
-        // HTML rule
+            // HTML rule
         } elseif (Str::contains($rule, '##') || Str::contains($rule, '#@#')) {
             $this->isHtml = true;
 
-        // URI rule
+            // URI rule
         } else {
             $this->makeRegex();
         }
     }
 
     /**
-     * @param  string  $url
+     * @param  string $url
      *
      * @return  boolean
      */
     public function matchUrl($url)
     {
-        return (boolean)preg_match(
-            '/' . $this->getRegex() . '/',
-            $url
-        );
+        try {
+            return (boolean)preg_match('/' . $this->getRegex() . '/', $url);
+        } catch (\Exception $e) {
+            throw  new \Exception($e);
+        }
     }
 
     /**
@@ -55,6 +84,14 @@ class AdblockRule
     public function getRegex()
     {
         return $this->regex;
+    }
+
+    /**
+     * @return  string
+     */
+    public function getRule()
+    {
+        return $this->rule;
     }
 
     /**
@@ -81,6 +118,9 @@ class AdblockRule
         return $this->isException;
     }
 
+    /**
+     * @throws InvalidRuleException
+     */
     private function makeRegex()
     {
         if (empty($this->rule)) {
@@ -89,19 +129,9 @@ class AdblockRule
 
         $regex = $this->rule;
 
-        // Check if the rule isn't already regexp
-        if (Str::startsWith($regex, '/') && Str::endsWith($regex, '/')) {
-            $this->regex = mb_substr($this->rule, 1, mb_strlen($this->rule) - 2);
-
-            if (empty($this->regex)) {
-                throw new InvalidRuleException("Empty rule");
-            }
-
-            return;
+        foreach (self::FILTER_REGEXES as $rule => $replacement) {
+            $regex = preg_replace($rule, $replacement, $regex);
         }
-
-        // escape special regex characters
-        $regex = preg_replace("/([\\\.\$\+\?\{\}\(\)\[\]\/])/", "\\\\$1", $this->rule);
 
         // Separator character ^ matches anything but a letter, a digit, or
         // one of the following: _ - . %. The end of the address is also

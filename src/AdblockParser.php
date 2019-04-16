@@ -3,13 +3,24 @@ namespace Limonte;
 
 class AdblockParser
 {
+    /**
+     * @var AdblockRule[]
+     */
     private $rules;
 
     private $cacheFolder;
 
     private $cacheExpire = 1; // 1 day
 
-    public function __construct($rules = [])
+    public function __construct(array $rules = [])
+    {
+        $this->initRules($rules);
+    }
+
+    /**
+     * @param array $rules
+     */
+    public function initRules(array $rules = [])
     {
         $this->rules = [];
         $this->addRules($rules);
@@ -50,7 +61,7 @@ class AdblockParser
                 $rules = preg_split("/(\r\n|\n|\r)/", $content);
                 $this->addRules($rules);
             }
-        // array of resources
+            // array of resources
         } elseif (is_array($path)) {
             foreach ($path as $item) {
                 $this->loadRules($item);
@@ -67,12 +78,13 @@ class AdblockParser
     }
 
     /**
-     * @param  string  $url
-     *
-     * @return boolean
+     * @param string $url
+     * @return string[]
+     * @throws \Exception
      */
     public function shouldBlock($url)
     {
+        $rules = [];
         $url = trim($url);
 
         if (filter_var($url, FILTER_VALIDATE_URL) === false) {
@@ -80,19 +92,16 @@ class AdblockParser
         }
 
         foreach ($this->rules as $rule) {
-            if ($rule->isComment() || $rule->isHtml()) {
+            if ($rule->isComment() || $rule->isHtml() || $rule->isException()) {
                 continue;
             }
 
             if ($rule->matchUrl($url)) {
-                if ($rule->isException()) {
-                    return false;
-                }
-                return true;
+                $rules[] = $rule->getRule();
             }
         }
 
-        return false;
+        return $rules;
     }
 
     /**
